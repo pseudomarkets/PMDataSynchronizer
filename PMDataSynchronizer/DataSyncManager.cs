@@ -29,7 +29,7 @@ namespace PMDataSynchronizer
             DbConnectionString = connectionString;
         }
 
-        public static async Task<bool> SyncPositions(Positions position, Users user, DbSyncMethod syncMethod)
+        public async Task<bool> SyncPositions(Positions position, Users user, DbSyncMethod syncMethod)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace PMDataSynchronizer
             }
         }
 
-        public static async Task<bool> SyncTransactions(Transactions transaction, Users user, DbSyncMethod syncMethod)
+        public async Task<bool> SyncTransactions(Transactions transaction, Users user, DbSyncMethod syncMethod)
         {
             try
             {
@@ -105,7 +105,7 @@ namespace PMDataSynchronizer
             }
         }
 
-        public static async Task<bool> SyncOrders(Orders order, Users user, DbSyncMethod syncMethod)
+        public async Task<bool> SyncOrders(Orders order, Users user, DbSyncMethod syncMethod)
         {
             try
             {
@@ -143,7 +143,7 @@ namespace PMDataSynchronizer
             }
         }
 
-        public static async Task<bool> SyncAccounts(Accounts account, Users user, DbSyncMethod syncMethod)
+        public async Task<bool> SyncAccounts(Accounts account, Users user, DbSyncMethod syncMethod)
         {
             try
             {
@@ -181,7 +181,7 @@ namespace PMDataSynchronizer
             }
         }
 
-        public static async Task<bool> SyncUsers(Users user, DbSyncMethod syncMethod)
+        public async Task<bool> SyncUsers(Users user, DbSyncMethod syncMethod)
         {
             try
             {
@@ -219,7 +219,7 @@ namespace PMDataSynchronizer
             }
         }
 
-        public static async Task<bool> SyncTokens(Tokens token, Users user, DbSyncMethod syncMethod)
+        public async Task<bool> SyncTokens(Tokens token, Users user, DbSyncMethod syncMethod)
         {
             try
             {
