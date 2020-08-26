@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>PMDataSynchronizer</PackageId>
+    <Version>1.0.0.0</Version>
+    <Authors>Shravan Jambukesan</Authors>
+    <Company>Pseudo Markets</Company>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Database synchronization library for hosting multiple instances of Pseudo Markets</Description>
+    <Copyright>(c) 2020 Pseudo Markets</Copyright>
+    <PackageProjectUrl>https://github.com/pseudomarkets/PMCommonEntities</PackageProjectUrl>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageReleaseNotes>* Initial release</PackageReleaseNotes>
+    <PackageTags>pseudomarkets</PackageTags>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.7" />
+    <PackageReference Include="PMCommonEntities" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
