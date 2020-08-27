@@ -21,7 +21,8 @@ namespace PMDataSynchronizer
         public enum DbSyncMethod : int
         {
             Insert = 1,
-            Update = 2
+            Update = 2,
+            Delete = 3
         }
 
         public DataSyncManager(string connectionString)
@@ -47,6 +48,10 @@ namespace PMDataSynchronizer
                                 break;
                             case DbSyncMethod.Update:
                                 db.Entry(position).State = EntityState.Modified;
+                                await db.SaveChangesAsync();
+                                break;
+                            case DbSyncMethod.Delete:
+                                db.Entry(position).State = EntityState.Deleted;
                                 await db.SaveChangesAsync();
                                 break;
                         }
@@ -87,6 +92,10 @@ namespace PMDataSynchronizer
                                 db.Entry(transaction).State = EntityState.Modified;
                                 await db.SaveChangesAsync();
                                 break;
+                            case DbSyncMethod.Delete:
+                                db.Entry(transaction).State = EntityState.Deleted;
+                                await db.SaveChangesAsync();
+                                break;
                         }
                         wroteRecord = true;
                     }
@@ -123,6 +132,10 @@ namespace PMDataSynchronizer
                                 break;
                             case DbSyncMethod.Update:
                                 db.Entry(order).State = EntityState.Modified;
+                                await db.SaveChangesAsync();
+                                break;
+                            case DbSyncMethod.Delete:
+                                db.Entry(order).State = EntityState.Deleted;
                                 await db.SaveChangesAsync();
                                 break;
                         }
@@ -163,6 +176,10 @@ namespace PMDataSynchronizer
                                 db.Entry(account).State = EntityState.Modified;
                                 await db.SaveChangesAsync();
                                 break;
+                            case DbSyncMethod.Delete:
+                                db.Entry(account).State = EntityState.Deleted;
+                                await db.SaveChangesAsync();
+                                break;
                         }
                         wroteRecord = true;
                     }
@@ -201,6 +218,10 @@ namespace PMDataSynchronizer
                                 db.Entry(user).State = EntityState.Modified;
                                 await db.SaveChangesAsync();
                                 break;
+                            case DbSyncMethod.Delete:
+                                db.Entry(user).State = EntityState.Deleted;
+                                await db.SaveChangesAsync();
+                                break;
                         }
                         wroteRecord = true;
                     }
@@ -237,6 +258,10 @@ namespace PMDataSynchronizer
                                 break;
                             case DbSyncMethod.Update:
                                 db.Entry(token).State = EntityState.Modified;
+                                await db.SaveChangesAsync();
+                                break;
+                            case DbSyncMethod.Delete:
+                                db.Entry(token).State = EntityState.Deleted;
                                 await db.SaveChangesAsync();
                                 break;
                         }
