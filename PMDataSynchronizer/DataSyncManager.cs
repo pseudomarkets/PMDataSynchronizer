@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -37,21 +38,36 @@ namespace PMDataSynchronizer
                 bool wroteRecord = false;
                 await using (var db = new PseudoMarketsDbContext(DbConnectionString))
                 {
-                    var userExists = await db.Users.Where(x => x.Username == user.Username).AnyAsync();
+                    var userExists = db.Users.Any(x => x.Username == user.Username);
                     if (userExists)
                     {
+                        var localUser = db.Users.FirstOrDefault(x => x.Username == user.Username);
+                        var accountId = db.Accounts.FirstOrDefault(x => x.UserID == localUser.Id).Id;
+                        var existingPosition = await db.Positions
+                            .Where(x => x.AccountId == accountId && x.Symbol == position.Symbol)
+                            .FirstOrDefaultAsync();
                         switch (syncMethod)
                         {
                             case DbSyncMethod.Insert:
-                                await db.Positions.AddAsync(position);
+                                Positions localPosition = new Positions()
+                                {
+                                    OrderId = position.OrderId,
+                                    Symbol = position.Symbol,
+                                    AccountId = accountId,
+                                    Quantity = position.Quantity,
+                                    Value = position.Value
+                                };
+                                await db.Positions.AddAsync(localPosition);
                                 await db.SaveChangesAsync();
                                 break;
                             case DbSyncMethod.Update:
-                                db.Entry(position).State = EntityState.Modified;
+                                existingPosition.Value = position.Value;
+                                existingPosition.Quantity = position.Quantity;
+                                db.Entry(existingPosition).State = EntityState.Modified;
                                 await db.SaveChangesAsync();
                                 break;
                             case DbSyncMethod.Delete:
-                                db.Entry(position).State = EntityState.Deleted;
+                                db.Entry(existingPosition).State = EntityState.Deleted;
                                 await db.SaveChangesAsync();
                                 break;
                         }
@@ -79,21 +95,20 @@ namespace PMDataSynchronizer
                 bool wroteRecord = false;
                 await using (var db = new PseudoMarketsDbContext(DbConnectionString))
                 {
-                    var userExists = await db.Users.Where(x => x.Username == user.Username).AnyAsync();
+                    var userExists = db.Users.Any(x => x.Username == user.Username);
                     if (userExists)
                     {
                         switch (syncMethod)
                         {
                             case DbSyncMethod.Insert:
-                                await db.Transactions.AddAsync(transaction);
-                                await db.SaveChangesAsync();
-                                break;
-                            case DbSyncMethod.Update:
-                                db.Entry(transaction).State = EntityState.Modified;
-                                await db.SaveChangesAsync();
-                                break;
-                            case DbSyncMethod.Delete:
-                                db.Entry(transaction).State = EntityState.Deleted;
+                                var localUser = db.Users.FirstOrDefault(x => x.Username == user.Username);
+                                var accountId = db.Accounts.FirstOrDefault(x => x.UserID == localUser.Id).Id;
+                                Transactions localTransaction = new Transactions()
+                                {
+                                    TransactionId = transaction.TransactionId,
+                                    AccountId = accountId
+                                };
+                                await db.Transactions.AddAsync(localTransaction);
                                 await db.SaveChangesAsync();
                                 break;
                         }
@@ -121,21 +136,22 @@ namespace PMDataSynchronizer
                 bool wroteRecord = false;
                 await using (var db = new PseudoMarketsDbContext(DbConnectionString))
                 {
-                    var userExists = await db.Users.Where(x => x.Username == user.Username).AnyAsync();
+                    var userExists = db.Users.Any(x => x.Username == user.Username);
                     if (userExists)
                     {
                         switch (syncMethod)
                         {
                             case DbSyncMethod.Insert:
-                                await db.Orders.AddAsync(order);
-                                await db.SaveChangesAsync();
-                                break;
-                            case DbSyncMethod.Update:
-                                db.Entry(order).State = EntityState.Modified;
-                                await db.SaveChangesAsync();
-                                break;
-                            case DbSyncMethod.Delete:
-                                db.Entry(order).State = EntityState.Deleted;
+                                Orders localOrder = new Orders()
+                                {
+                                    Price = order.Price,
+                                    Quantity = order.Quantity,
+                                    Date = order.Date,
+                                    Symbol = order.Symbol,
+                                    TransactionID = order.TransactionID,
+                                    Type = order.Type
+                                };
+                                await db.Orders.AddAsync(localOrder);
                                 await db.SaveChangesAsync();
                                 break;
                         }
@@ -163,21 +179,20 @@ namespace PMDataSynchronizer
                 bool wroteRecord = false;
                 await using (var db = new PseudoMarketsDbContext(DbConnectionString))
                 {
-                    var userExists = await db.Users.Where(x => x.Username == user.Username).AnyAsync();
+                    var userExists = db.Users.Any(x => x.Username == user.Username);
                     if (userExists)
                     {
+                        var localUser = db.Users.FirstOrDefault(x => x.Username == user.Username);
+                        var existingAccount = db.Accounts.FirstOrDefault(x => x.UserID == localUser.Id);
                         switch (syncMethod)
                         {
-                            case DbSyncMethod.Insert:
-                                await db.Accounts.AddAsync(account);
-                                await db.SaveChangesAsync();
-                                break;
                             case DbSyncMethod.Update:
-                                db.Entry(account).State = EntityState.Modified;
+                                existingAccount.Balance = account.Balance;
+                                db.Entry(existingAccount).State = EntityState.Modified;
                                 await db.SaveChangesAsync();
                                 break;
                             case DbSyncMethod.Delete:
-                                db.Entry(account).State = EntityState.Deleted;
+                                db.Entry(existingAccount).State = EntityState.Deleted;
                                 await db.SaveChangesAsync();
                                 break;
                         }
@@ -205,24 +220,66 @@ namespace PMDataSynchronizer
                 bool wroteRecord = false;
                 await using (var db = new PseudoMarketsDbContext(DbConnectionString))
                 {
-                    var userExists = await db.Users.Where(x => x.Username == user.Username).AnyAsync();
+                    var userExists = db.Users.Any(x => x.Username == user.Username);
                     if (userExists)
                     {
+                        var existingUser = db.Users.FirstOrDefault(x => x.Username == user.Username);
                         switch (syncMethod)
                         {
-                            case DbSyncMethod.Insert:
-                                await db.Users.AddAsync(user);
-                                await db.SaveChangesAsync();
-                                break;
                             case DbSyncMethod.Update:
-                                db.Entry(user).State = EntityState.Modified;
+                                existingUser.Password = user.Password;
+                                existingUser.Salt = user.Salt;
+                                db.Entry(existingUser).State = EntityState.Modified;
                                 await db.SaveChangesAsync();
                                 break;
                             case DbSyncMethod.Delete:
-                                db.Entry(user).State = EntityState.Deleted;
+                                db.Entry(existingUser).State = EntityState.Deleted;
                                 await db.SaveChangesAsync();
                                 break;
                         }
+                        wroteRecord = true;
+                    }
+                    else
+                    {
+                        wroteRecord = true;
+                    }
+                }
+
+                return wroteRecord;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public async Task<bool> SyncNewUser(Users user, string token)
+        {
+            try
+            {
+                bool wroteRecord = false;
+                await using (var db = new PseudoMarketsDbContext(DbConnectionString))
+                {
+                    var userExists = db.Users.Any(x => x.Username == user.Username);
+                    if (!userExists)
+                    {
+                        await db.Users.AddAsync(user);
+                        await db.SaveChangesAsync();
+                        Users createdUser = db.Users.FirstOrDefault(x => x.Username == user.Username);
+                        Tokens newToken = new Tokens()
+                        {
+                            UserID = createdUser.Id,
+                            Token = token
+                        };
+                        Accounts newAccount = new Accounts()
+                        {
+                            UserID = createdUser.Id,
+                            Balance = 1000000.99
+                        };
+                        await db.Tokens.AddAsync(newToken);
+                        await db.Accounts.AddAsync(newAccount);
+                        await db.SaveChangesAsync();
                         wroteRecord = true;
                     }
                     else
@@ -247,21 +304,19 @@ namespace PMDataSynchronizer
                 bool wroteRecord = false;
                 await using (var db = new PseudoMarketsDbContext(DbConnectionString))
                 {
-                    var userExists = await db.Users.Where(x => x.Username == user.Username).AnyAsync();
+                    var userExists = db.Users.Any(x => x.Username == user.Username);
                     if (userExists)
                     {
+                        var existingToken = db.Tokens.FirstOrDefault(x => x.UserID == user.Id);
                         switch (syncMethod)
                         {
-                            case DbSyncMethod.Insert:
-                                await db.Tokens.AddAsync(token);
-                                await db.SaveChangesAsync();
-                                break;
                             case DbSyncMethod.Update:
-                                db.Entry(token).State = EntityState.Modified;
+                                existingToken.Token = token.Token;
+                                db.Entry(existingToken).State = EntityState.Modified;
                                 await db.SaveChangesAsync();
                                 break;
                             case DbSyncMethod.Delete:
-                                db.Entry(token).State = EntityState.Deleted;
+                                db.Entry(existingToken).State = EntityState.Deleted;
                                 await db.SaveChangesAsync();
                                 break;
                         }

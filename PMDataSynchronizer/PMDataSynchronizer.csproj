@@ -1,18 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>PMDataSynchronizer</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.6</Version>
     <Authors>Shravan Jambukesan</Authors>
     <Company>Pseudo Markets</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Database synchronization library for hosting multiple instances of Pseudo Markets</Description>
     <Copyright>(c) 2020 Pseudo Markets</Copyright>
-    <PackageProjectUrl>https://github.com/pseudomarkets/PMCommonEntities</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/pseudomarkets/PMDataSynchronizer</PackageProjectUrl>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageReleaseNotes>* Initial release</PackageReleaseNotes>
+    <PackageReleaseNotes>* Improved update logic for all tables</PackageReleaseNotes>
     <PackageTags>pseudomarkets</PackageTags>
     <LangVersion>8</LangVersion>
   </PropertyGroup>
